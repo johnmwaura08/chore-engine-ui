@@ -1,0 +1,73 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-namespace */
+import { ToastOptions, toast } from "react-toastify";
+
+export enum ToastTypeEnum {
+  Success = "Success",
+  Error = "Error",
+  Information = "Information",
+}
+export module GridHelperFunctions {
+  const toastOptions: ToastOptions = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  };
+
+  export const toaster = (type: ToastTypeEnum, message?: string) => {
+    switch (type) {
+      case ToastTypeEnum.Error:
+        {
+          const msg = message || "There was a problem processing your request";
+          toast.error(`${msg}`, toastOptions);
+        }
+        break;
+      case ToastTypeEnum.Success:
+        {
+          const msg = message || "Success";
+          toast.success(`${msg}`, toastOptions);
+        }
+        break;
+      case ToastTypeEnum.Information:
+        {
+          const msg = message || "Information";
+          toast.info(`${msg}`, toastOptions);
+        }
+        break;
+      default:
+    }
+  };
+
+  export const calculateRecordsFound = (arr: any) => {
+    if (Array.isArray(arr) && arr.length > 0) {
+      return arr.length;
+    }
+    return 0;
+  };
+
+  export function isMobileView(width: number) {
+    // Define a breakpoint for mobile view (e.g., 768 pixels)
+    const mobileBreakpoint = 768;
+  
+    // Check if the viewport width is less than the mobile breakpoint
+    return width < mobileBreakpoint;
+  }
+  
+
+  export function isDateToday(dateTimeString: string): boolean {
+    const inputDate = new Date(dateTimeString);
+    const today = new Date();
+
+    // Compare the year, month, and day of both dates
+    return (
+      inputDate.getFullYear() === today.getFullYear() &&
+      inputDate.getMonth() === today.getMonth() &&
+      inputDate.getDate() === today.getDate()
+    );
+  }
+  export const isValidArray = <T>(arr: T[] | undefined | null): boolean => Array.isArray(arr) && arr.length > 0;
+}
