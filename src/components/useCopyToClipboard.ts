@@ -31,7 +31,7 @@ export const useCopyToClipboard = () => {
           const message = "Copied to clipboard.";
 
       copyToClipboard(text);
-      GridHelperFunctions.Toaster(ToastTypeEnum.Information, message);
+      GridHelperFunctions.toaster(ToastTypeEnum.Information, message);
     },
     []
   );
