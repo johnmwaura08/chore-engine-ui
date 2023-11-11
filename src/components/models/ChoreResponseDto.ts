@@ -6,7 +6,7 @@ export type ChoreResponseDto = {
     familyId: number;
     familyName: string;
     frequency: string;
-    dayOfMonth: number | null;
+    dayOfMonth: string | null;
     dayOfWeek: number | null;
     specificDate: Date | null;
     userId: number;
