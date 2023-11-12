@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import List from "devextreme-react/list";
 
 const navigation = [
