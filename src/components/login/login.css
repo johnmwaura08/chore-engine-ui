@@ -1,0 +1,77 @@
+#duo-frame {
+	width: 100%;
+	min-width: 304px;
+	max-width: 620px;
+	height: 330px;
+	border: none;
+}
+
+.boit-login-header {
+	text-align: center;
+	margin-bottom: 40px;
+}
+
+.boit-login-header .title {
+	font-weight: bold;
+	font-size: 30px;
+	margin: 0px;
+}
+
+.boit-login-form {
+	padding-top: 7.5rem;
+	width: 450px;
+	margin: auto auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.boit-login-form .dx-scrollable-wrapper {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border-radius: 2px;
+	border: 0px solid #cccccc;
+	padding: 1rem;
+}
+
+.logo {
+	color: #0a3255 !important;
+	font-weight: 700;
+	font-size: 26;
+}
+
+.forgot-password {
+	/* color: #4FC6E0; */
+	color: #0a3255 !important;
+	display: block;
+	margin-top: -20px;
+	margin-bottom: 20px;
+}
+
+.forgot-password:hover {
+	color: #f35625 !important;
+}
+
+.login-button {
+	background-color: #0a3255;
+	border: none;
+	border-radius: 5px;
+	font-family: Proxima Nova, sans-serif;
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 600;
+	letter-spacing: 0.08px;
+	width: 335px;
+	height: 3rem;
+}
+
+.login-button:hover {
+	background-color: #f35625 !important;
+	cursor: pointer;
+}
+
+.login-subtitle {
+    margin-top: 2rem;
+}
