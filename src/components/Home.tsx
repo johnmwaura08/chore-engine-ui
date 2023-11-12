@@ -1,63 +1,76 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "devextreme/data/odata/store";
-import DataGrid, {
-  Column,
-  Paging,
-  Pager,
-  FilterRow,
-  OperationDescriptions,
-  Toolbar,
-  HeaderFilter,
-  SearchPanel,
-  Sorting,
-  Lookup,
-  Editing,
-  ColumnChooser,
-  Form,
-  GroupPanel,
-  Grouping,
-  Popup,
-  Scrolling,
-  Item as GridItem,
-} from "devextreme-react/data-grid";
 import React from "react";
-import { useClearFilter } from "./useClearFilter";
 import useIsMounted from "./useIsMounted";
-import { LoadPanel, DateBox, SelectBox } from "devextreme-react";
-import { ClearFiltersButton } from "./ClearFiltersButton";
-import { RecordsFoundToolbarItem } from "./RecordsFoundToolbarItem";
+import { LoadPanel } from "devextreme-react";
 import { GridHelperFunctions, ToastTypeEnum } from "./grid.helpers";
-import { Item, Label } from "devextreme-react/form";
 import { ChoreResponseDto } from "./models/ChoreResponseDto";
 import { UserResponseDto } from "./models/UserResponseDto";
 import { choreApi } from "../api/chore.api";
 import { userApi } from "../api/user.api";
-import useScreenSize from "./useScreenSize";
+import { Frequency, _dayOfTheWeekStore } from "./stores";
+import ChoreGrid from "./ChoreGrid";
+import { AddEditChore } from "./addEditChore/AddEditChore";
+import { IDeleteChoreDto } from "./models/CreateChoreRequest";
 
-const allowedPageSizes = [15, 30, 50, 100, 1000];
+export enum Mode {
+  Insert,
+  Update,
+  None,
+}
 
-const frequencyStore = [
-  { id: "DAILY", name: "Daily" },
-  { id: "WEEKLY", name: "Weekly" },
-  { id: "MONTHLY", name: "Monthly" },
-  { id: "BIWEEKLY", name: "Biweekly" },
-  { id: "SPECIFIC_DATE", name: "Specific Date" },
-];
+export interface IFormState {
+  description: string;
+  name: string;
+  mode: Mode;
+  frequency: string;
+  dayOfMonth: any | null;
+  dayOfWeek: number | null;
+  biWeeklyDayOfWeek: number | null;
+  specificDate: Date | null;
+  userId: number;
+  weeklyVisible: boolean;
+  biWeeklyVisible: boolean;
+  monthlyVisible: boolean;
+  specificDateVisible: boolean;
+  isLoading: boolean;
+  choreId: number;
+}
+
+export type FormStateAction = Partial<IFormState>;
 
 export const Home = () => {
-  const dataGridRef = React.useRef<any>();
-
   const isMounted = useIsMounted();
-  const { handleClearFilter } = useClearFilter(dataGridRef);
   const [loading, setLoading] = React.useState(false);
-
-  const { width } = useScreenSize();
 
   const [users, setUsers] = React.useState<UserResponseDto[]>([]);
   const [chores, setChores] = React.useState<ChoreResponseDto[]>([]);
 
-  const [formDS, setFormDS] = React.useState<any>();
+  const [formState, setFormState] = React.useReducer(
+    (state: IFormState, newState: FormStateAction) => ({
+      ...state,
+      ...newState,
+    }),
+    {
+      choreId: -1,
+      userId: -1,
+      specificDate: null,
+      isLoading: false,
+      specificDateVisible: false,
+      monthlyVisible: false,
+      weeklyVisible: false,
+      biWeeklyVisible: false,
+      frequency: "",
+      dayOfMonth: null,
+      dayOfWeek: null,
+      biWeeklyDayOfWeek: null,
+      name: "",
+      description: "",
+      mode: Mode.None,
+    } as IFormState
+  );
+
   const fetchData = React.useCallback(async () => {
     try {
       setLoading(true);
@@ -66,7 +79,6 @@ export const Home = () => {
 
       setChores(chores);
       setUsers(users);
-      setFormDS(chores[0]);
     } catch (error) {
       console.error(error);
     } finally {
@@ -80,201 +92,120 @@ export const Home = () => {
     }
   }, [fetchData, isMounted]);
 
-  const onSaved = React.useCallback((e: any) => {
-    try {
-      setLoading(true);
-      console.log("changes are,", e);
-      console.log("formRef", formDS);
-      if (e.changes[0].type === "insert") {
-        const { data } = e.changes[0];
-        console.log("insert data is,", data);
-        //choreApi.createChore(chore);
-      }
-      if (e.changes[0].type === "update") {
-        const { data: chore } = e.changes[0];
-        console.log("update data is,", chore);
-      }
-    } catch (error) {
-      console.error(error);
-      GridHelperFunctions.toaster(ToastTypeEnum.Error);
-    } finally {
-      setLoading(false);
+  const onEditingStart = React.useCallback((e: any) => {
+    if (e?.row.data as ChoreResponseDto) {
+      setFormState({
+        choreId: e.row.data.id,
+        userId: e.row.data.userId,
+        specificDate: e.row.data.specificDate,
+        specificDateVisible: e.row.data.frequency === Frequency.SPECIFIC_DATE,
+        monthlyVisible: e.row.data.frequency === Frequency.MONTHLY,
+        weeklyVisible: e.row.data.frequency === Frequency.WEEKLY,
+        biWeeklyVisible: e.row.data.frequency === Frequency.BIWEEKLY,
+        frequency: e.row.data.frequency,
+        dayOfMonth: e.row.data.dayOfMonth
+          ? GridHelperFunctions.getISODateOfMonth(e.row.data.dayOfMonth)
+          : null,
+        dayOfWeek:
+          e.row.data.frequency === Frequency.WEEKLY
+            ? e.row.data.dayOfWeek
+            : null,
+        biWeeklyDayOfWeek:
+          e.row.data.frequency === Frequency.BIWEEKLY
+            ? e.row.data.dayOfWeek
+            : null,
+        name: e.row.data.name,
+        description: e.row.data.description,
+        mode: Mode.Update,
+      });
     }
   }, []);
 
-  const onEditingStart = React.useCallback((e: any) => {
-    if (e?.data) {
-      setFormDS(e.data);
-    } else {
-      setFormDS({});
-    }
+  const onInitNewRow = React.useCallback(() => {
+    setFormState({
+      mode: Mode.Insert,
+      userId: -1,
+      specificDate: null,
+      specificDateVisible: false,
+      monthlyVisible: false,
+      weeklyVisible: false,
+      biWeeklyVisible: false,
+      frequency: "",
+      dayOfMonth: null,
+      dayOfWeek: null,
+      biWeeklyDayOfWeek: null,
+      name: "",
+      description: "",
+      choreId: -1,
+    });
   }, []);
+
+  const handleReset = React.useCallback(() => {
+    setFormState({
+      mode: Mode.None,
+      userId: -1,
+      specificDate: null,
+      specificDateVisible: false,
+      monthlyVisible: false,
+      weeklyVisible: false,
+      biWeeklyVisible: false,
+      frequency: "",
+      dayOfMonth: null,
+      dayOfWeek: null,
+      biWeeklyDayOfWeek: null,
+      name: "",
+      description: "",
+      choreId: -1,
+    });
+  }, []);
+
+  const handleDeleteButtonClicked = React.useCallback(
+    async (e: any) => {
+      try {
+        setLoading(true);
+        const request: IDeleteChoreDto = {
+          choreId: e?.row?.data?.id,
+        };
+        const res = await choreApi.deleteChore(request);
+        if (res.status === 200 || res.status === 201) {
+          await fetchData();
+          GridHelperFunctions.toaster(ToastTypeEnum.Success);
+        } else {
+          GridHelperFunctions.toaster(ToastTypeEnum.Error, res.data as any);
+        }
+      } catch (error) {
+        console.error(error);
+        GridHelperFunctions.toaster(ToastTypeEnum.Error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchData]
+  );
 
   return (
     <div id="data-grid-demo">
       <LoadPanel visible={loading} position="center" showIndicator showPane />
-      <DataGrid
-        dataSource={chores}
-        keyExpr="id"
-        showBorders={true}
-        wordWrapEnabled
-        ref={dataGridRef}
-        width="97%"
-        columnHidingEnabled
-        allowColumnReordering
-        rowAlternationEnabled={true}
-        allowColumnResizing={true}
-        sorting={{ mode: "multiple" }}
-        style={{
-          marginTop: "1Orem !important",
-        }}
-        repaintChangesOnly
-        onSaved={onSaved}
+      <ChoreGrid
+        users={users}
+        chores={chores}
         onEditingStart={onEditingStart}
-        // onSaving={}
-      >
-        <SearchPanel
-          visible={true}
-          width={240}
-          highlightSearchText={true}
-          placeholder="Search..."
+        onInitNewRow={onInitNewRow}
+        handleDeleteButtonClicked={handleDeleteButtonClicked}
+      />
+      {formState.mode !== Mode.None ? (
+        <AddEditChore
+          visible
+          formState={formState}
+          setFormState={setFormState}
+          onHide={handleReset}
+          mode={formState.mode}
+          users={users}
+          fetchData={fetchData}
         />
-        <HeaderFilter visible={true} />
-        <FilterRow visible={true} applyFilter="auto">
-          <OperationDescriptions startsWith="Contains" />
-        </FilterRow>
-        <Toolbar>
-          <GridItem
-            location="before"
-            visible={!GridHelperFunctions.isMobileView(width)}
-          >
-            <RecordsFoundToolbarItem
-              recordsFound={GridHelperFunctions.calculateRecordsFound(chores)}
-            />
-          </GridItem>
-
-          <GridItem name="addRowButton" />
-          {/* <Item name='saveButton' /> */}
-          <GridItem location="after">
-            <ClearFiltersButton handleClearFilter={handleClearFilter} />
-          </GridItem>
-          <GridItem name="searchPanel" />
-          <GridItem name="columnChooserButton" />
-        </Toolbar>
-
-        <Paging defaultPageSize={30} />
-
-        <Pager
-          showPageSizeSelector={true}
-          allowedPageSizes={allowedPageSizes}
-          showInfo={true}
-        />
-        <Sorting mode="multiple" />
-
-        <Scrolling mode="standard" />
-        <Editing
-          mode="popup"
-          allowUpdating={true}
-          allowAdding={true}
-          allowDeleting={true}
-        >
-          <Grouping contextMenuEnabled={true} expandMode="rowClick" />
-          <GroupPanel
-            visible={true}
-            emptyPanelText="Use the context menu of header columns to group data"
-          />
-          <Popup
-            title="Employee Info"
-            showTitle={true}
-            minWidth="35%"
-            minHeight="45%"
-            resizeEnabled
-          />
-          <ColumnChooser enabled={true} mode="select" />
-          <Form formData={formDS}>
-            <Item itemType="group" colCount={2} colSpan={2}>
-              <Item dataField="name" isRequired />
-              <Item dataField="description">
-                <Label text="Additional instructions" />
-              </Item>
-              <Item
-                dataField="userName"
-                isRequired
-                // editorType="dxSelectBox"
-                // editorOptions={{
-                //   dataSource: users,
-                //   displayExpr: "name",
-                //   keyExpr: "name",
-                // }}
-              >
-                <SelectBox
-                  dataSource={users}
-                  displayExpr="name"
-                  valueExpr="id"
-                  defaultValue={formDS?.userId}
-                ></SelectBox>
-                <Label text="Assigned To" />
-              </Item>
-              <Item
-                dataField="frequency"
-                editorType="dxSelectBox"
-                isRequired
-                editorOptions={{
-                  dataSource: frequencyStore,
-                  displayExpr: "name",
-                  keyExpr: "id",
-                }}
-              >
-                <Label text="Frequency" />
-              </Item>
-              <Item
-                dataField="specificDate"
-                editorType="dxDateBox"
-                editorOptions={{
-                  type: "datetime",
-                }}
-              >
-                <DateBox
-                  type="datetime"
-                  defaultValue={formDS?.createdAt}
-                ></DateBox>
-                <Label text="Date" />
-              </Item>
-            </Item>
-          </Form>
-        </Editing>
-        <Column
-          dataField="name"
-          caption="Name"
-          //   width="auto"
-          allowGrouping={false}
-        />
-        <Column dataField="description" caption="Additional instructions" />
-        <Column
-          dataField="frequency"
-          caption="Frequency"
-          // width={80}
-        >
-          <Lookup
-            dataSource={frequencyStore}
-            displayExpr="name"
-            valueExpr="id"
-          />
-        </Column>
-        <Column
-          caption="Assigned To"
-          dataField="userName"
-          // width={100}
-        >
-          <Lookup dataSource={users} displayExpr="name" valueExpr="name" />
-        </Column>
-        <Column
-          dataField="updatedAt"
-          dataType="datetime"
-          caption="LastModified"
-          allowEditing={false}
-        />
-      </DataGrid>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

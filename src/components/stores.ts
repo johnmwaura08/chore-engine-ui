@@ -28,36 +28,20 @@ export const _dayOfTheWeekStore = [
       name: "Sunday",
     },
   ];
+
+
+  export enum Frequency {
+    DAILY = "DAILY",
+    WEEKLY = "WEEKLY",
+    BIWEEKLY = "BIWEEKLY",
+    MONTHLY = "MONTHLY",
+    SPECIFIC_DATE = "SPECIFIC_DATE",
+  }
   
-  console.log(_dayOfTheWeekStore)
- export  const _userStore = [
-    {
-      email: "johnmwaura08@gmail.com",
-      name: "Admin",
-    },
-    {
-      email: "lkiron17@gmail.com",
-      name: "Laura Kironget",
-    },
-  ];
-  
- export const users2 = [
-    {
-      email: "johnmwaura08@gmail.com",
-      familyName: "Maverick",
-      name: "Admin",
-      phoneNumber: "",
-      id: 17,
-      createdAt: "2023-11-08T18:10:29.873Z",
-      updatedAt: "2023-11-08T18:10:29.873Z",
-    },
-    {
-      email: "lkiron17@gmail.com",
-      familyName: "Maverick",
-      name: "Laura Kironget",
-      phoneNumber: "+14054125894",
-      id: 19,
-      createdAt: "2023-11-08T18:12:02.637Z",
-      updatedAt: "2023-11-08T18:12:02.637Z",
-    },
+  export const frequencyStore = [
+    { id: Frequency.DAILY, name: "Daily" },
+    { id: Frequency.WEEKLY, name: "Weekly" },
+    { id: Frequency.MONTHLY, name: "Monthly" },
+    { id: Frequency.BIWEEKLY, name: "Biweekly" },
+    { id: Frequency.SPECIFIC_DATE, name: "Specific Date" },
   ];

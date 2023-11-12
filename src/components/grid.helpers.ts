@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
 import { ToastOptions, toast } from "react-toastify";
+import { DateTime } from "luxon";
 
 export enum ToastTypeEnum {
   Success = "Success",
@@ -70,4 +71,54 @@ export module GridHelperFunctions {
     );
   }
   export const isValidArray = <T>(arr: T[] | undefined | null): boolean => Array.isArray(arr) && arr.length > 0;
+
+ 
+  export const formatToISO = (date: any): string => {
+    if(!date) return '';
+    // Convert the provided Date object to a Luxon DateTime object
+    const luxonDateTime = DateTime.fromJSDate(date);
+  
+    // Format the Luxon DateTime object to ISO string
+    const isoString = luxonDateTime.toISO();
+  
+    return isoString || ''; // Handle the case where Luxon fails to format the date
+  };
+
+ export function getValueOrDefault(value: any) {
+    if (value !== null && value !== '' && value !== undefined) {
+      return value;
+    } else {
+      return undefined;
+    }
+  }
+
+  export function formatDateForDB(date: any) {
+    
+    const val = getValueOrDefault(date);
+    if (val) {
+      return formatToISO(val);
+    } else {
+      return undefined;
+    }
+  }
+
+  export function getISODateOfMonth(dayOfMonth: number) {
+    // Get the current date and set the provided day of the month
+    const currentDate = DateTime.local().set({ day: dayOfMonth });
+  
+    // Format the date to ISO string
+    const isoDateString = currentDate.toISO();
+  
+    return isoDateString;
+  }
+  export function getDayOfMonthLuxon(date: any) {
+    // Check if the input is a valid Luxon DateTime object
+    if(!date) return undefined;
+  
+    const luxonDateTime = DateTime.fromJSDate(date);
+    return luxonDateTime.day;
+  
+ 
+  }
+  
 }
