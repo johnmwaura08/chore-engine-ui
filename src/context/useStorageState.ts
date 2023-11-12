@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from "react";
 
-type UseStateHook<T> = [[boolean, T | null], (value?: T | null) => void];
 
-function useAsyncState<T>(initialValue: [boolean, T | null] = [true, undefined]): UseStateHook<T> {
-	return React.useReducer(
-		(state: [boolean, T | null], action: T | null = null) => [false, action],
-		initialValue,
-	) as UseStateHook<T>;
+
+type UseStateHook<T> = [boolean, T | null, (value?: T | null) => void];
+
+function useAsyncState<T>(initialValue: [boolean, T | null] = [true, null]): UseStateHook<T> {
+  return React.useReducer<any>(
+    (state: UseStateHook<T>, action: T | null = null) => [false, action],
+    initialValue
+  ) as any;
 }
 
 export async function setStorageItemAsync(key: string, value: string | null) {
@@ -23,7 +26,7 @@ export async function setStorageItemAsync(key: string, value: string | null) {
 	}
 }
 
-export  function getStorageItemAsync(key: string): string | null  {
+export  function getStorageItemAsync(key: string): any {
 	try {
 		if (typeof localStorage !== "undefined") {
 			const item =  localStorage.getItem(key);
@@ -35,9 +38,9 @@ export  function getStorageItemAsync(key: string): string | null  {
 	}
 }
 
-export function useStorageState(key: string): UseStateHook<string> {
+export function useStorageState(key: string): any {
 	// Public
-	const [state, setState] = useAsyncState<string>();
+	const [state, setState] = useAsyncState<any>();
 
 	// Get
 	React.useEffect(() => {
@@ -54,7 +57,7 @@ export function useStorageState(key: string): UseStateHook<string> {
 
 	// Set
 	const setValue = React.useCallback(
-		(value: string | null) => {
+		(value: any) => {
 			setStorageItemAsync(key, value).then(() => {
 				setState(value);
 			});
