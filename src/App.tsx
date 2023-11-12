@@ -1,16 +1,18 @@
-import { Home } from './components/Home'
-
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import { AppRouter } from "./AppRouter";
+import { BrowserRouter as Router } from "react-router-dom";
 
 function App() {
-
   return (
-    <>
-     <ToastContainer limit={3} />
-     <Home />
-    </>
-  )
+    <Router>
+      <ToastContainer limit={3} />
+      <AppRouter />
+      {/* <Header2 /> */}
+      {/* <LoginMain /> */}
+      {/* <Home /> */}
+    </Router>
+  );
 }
 
-export default App
+export default App;
