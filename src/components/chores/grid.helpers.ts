@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { ToastOptions, toast } from "react-toastify";
 import { DateTime } from "luxon";
+import axios from "axios";
 
 export enum ToastTypeEnum {
   Success = "Success",
@@ -17,6 +18,14 @@ export module GridHelperFunctions {
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
+  };
+	export const passwordComplexity = (e: any): boolean => validatePasswordComplexity(e.value);
+
+  export const validatePasswordComplexity = (password: string): boolean => {
+    const passwordRegex = new RegExp(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*([^a-zA-Z\d\s])).{8,20}$/,
+    );
+    return passwordRegex.test(password);
   };
 
   export const toaster = (type: ToastTypeEnum, message?: string) => {
@@ -119,6 +128,21 @@ export module GridHelperFunctions {
     return luxonDateTime.day;
   
  
+  }
+  export const stringIsNullOrEmpty = (str: string | undefined): boolean =>
+  str === null || str === undefined || str === '' || str.trim().length === 0;
+
+  export function handleAxiosError(error: any){
+    if (axios.isAxiosError(error)) {
+      console.error("axios res", error.response);
+     toaster(
+        ToastTypeEnum.Error,
+        error?.response?.data?.message
+      );
+    } else {
+      console.error(error);
+   toaster(ToastTypeEnum.Error);
+    }
   }
   
 }

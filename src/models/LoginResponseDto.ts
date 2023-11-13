@@ -4,4 +4,5 @@ export interface LoginResponseDto {
     refreshToken: string;
     phoneNumber: string;
     passwordExpired: boolean;
+    id:number
   }

@@ -1,33 +1,36 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Form, { Label, RequiredRule, SimpleItem } from "devextreme-react/form";
+import Form, {
+  Label,
+  RequiredRule,
+  SimpleItem,
+  CompareRule,
+  CustomRule,
+} from "devextreme-react/form";
 import { Button, ScrollView } from "devextreme-react";
-import { FC } from "react";
-// import "../login.css";
 import logo from "../../assets/logo.png";
 import React from "react";
 import "./login.css";
-import { EmailRule } from "devextreme-react/data-grid";
 import { GridHelperFunctions, ToastTypeEnum } from "../chores/grid.helpers";
-import { authApi } from "../../api/auth.api";
 import { useNavigate, useLocation } from "react-router";
 import { IChoreEngineAuthStorage, useAuthContext } from "context/useAuth";
 import { ChoreEngineTokens } from "models/chore-engine.tokens";
+import { userApi } from "api/user.api";
 
 interface IFormState {
-  email: string;
   password: string;
+  confirmPassword: string;
 }
 
-export const LoginForm: FC = (): JSX.Element => {
+export const ChangePasswordForm: React.FC = () => {
   const formRef = React.useRef<any>();
   const [dataSource, setDataSource] = React.useState<IFormState>({
-    email: "",
     password: "",
+    confirmPassword: "",
   });
   const navigate = useNavigate();
   const location = useLocation();
-  const { initAuth, handleLoginResponse } = useAuthContext();
+  const { initAuth } = useAuthContext();
   const { from } = location.state || { from: { pathname: "/" } };
 
   const onEnterKeyPressed = () => {
@@ -38,10 +41,9 @@ export const LoginForm: FC = (): JSX.Element => {
     }
   };
 
-  const handleLogin = async () => {
+  const handleChangePassword = async () => {
     try {
-      const res = await authApi.login({
-        email: dataSource.email,
+      const res = await userApi.changePassword({
         password: dataSource.password,
       });
       if (res.status === 200 || res.status === 201) {
@@ -57,7 +59,7 @@ export const LoginForm: FC = (): JSX.Element => {
         initAuth(toStore);
         navigate(from);
       } else {
-        GridHelperFunctions.toaster(ToastTypeEnum.Error, "Invalid Credentials");
+        GridHelperFunctions.toaster(ToastTypeEnum.Error);
       }
     } catch (error) {
       GridHelperFunctions.handleAxiosError(error);
@@ -67,7 +69,7 @@ export const LoginForm: FC = (): JSX.Element => {
   const onSubmit = async () => {
     const result = formRef && formRef.current.instance.validate();
     if (result.isValid) {
-      await handleLogin();
+      await handleChangePassword();
     }
   };
 
@@ -79,7 +81,7 @@ export const LoginForm: FC = (): JSX.Element => {
     >
       <div className="chore-engine-login-header">
         <img src={logo} alt="Logo" style={{ width: 240, marginRight: 10 }} />
-        <div className="login-subtitle">Authentication Required</div>
+        <div className="login-subtitle">Your Password Has Expired</div>
       </div>
 
       <form onSubmit={onSubmit}>
@@ -90,24 +92,38 @@ export const LoginForm: FC = (): JSX.Element => {
           formData={dataSource}
           labelLocation="left"
           readOnly={false}
-          validationGroup="formAddNotification"
+          validationGroup="changePasswordForm"
           showValidationSummary
         >
           <SimpleItem
-            dataField="email"
-            editorOptions={{ onEnterKey: onEnterKeyPressed }}
-            isRequired
+            editorType="dxTextBox"
+            editorOptions={{
+              onEnterKey: onEnterKeyPressed,
+              showClearButton: true,
+              mode: "password",
+            }}
+            dataField="password"
           >
-            <Label text="Email" />
-            <RequiredRule message="Email is required" />
-            <EmailRule message="Email is invalid" />
+            <Label text="New Password" />
+            <RequiredRule message="New Password is required" />
+            <CustomRule
+              message="New Password must be between eight to twenty characters in length, comprised of at least one lower case, one upper case, one digit, and one special character"
+              validationCallback={GridHelperFunctions.passwordComplexity}
+            />
           </SimpleItem>
           <SimpleItem
-            dataField="password"
-            editorType="dxTextBox"
-            editorOptions={{ mode: "password", onEnterKey: onEnterKeyPressed }}
-            isRequired
-          />
+            dataField="confirmPassword"
+            editorOptions={{
+              onEnterKey: onEnterKeyPressed,
+              showClearButton: true,
+              mode: "password",
+            }}
+          >
+            <CompareRule
+              message="Both passwords must be the same"
+              comparisonTarget={() => dataSource.password}
+            />
+          </SimpleItem>
           <SimpleItem>
             <div
               className="dx-field"
@@ -119,7 +135,7 @@ export const LoginForm: FC = (): JSX.Element => {
             >
               <Button
                 type="default"
-                text="Sign In"
+                text="Submit"
                 width={270}
                 onClick={onSubmit}
                 style={{

@@ -3,16 +3,23 @@
 
 import React, { PropsWithChildren } from "react";
 import { useStorageState } from "./useStorageState";
-import { LoginResponseDto } from "components/models/LoginResponseDto";
-import { ChoreEngineTokens } from "components/models/chore-engine.tokens";
+import { LoginResponseDto } from "models/LoginResponseDto";
+import { ChoreEngineTokens } from "models/chore-engine.tokens";
 
 interface IAuthContext {
-  initAuth: (tokens: ChoreEngineTokens) => void;
+  initAuth: (authStore: IChoreEngineAuthStorage) => void;
   signOut: () => void;
-  session?: string | null;
+  session?: IChoreEngineAuthStorage | null;
   appLoading: boolean;
+  isAuthenticated: boolean;
   setAppLoading: React.Dispatch<React.SetStateAction<boolean>>;
   handleLoginResponse: (usr: LoginResponseDto) => void;
+  loginResponse: LoginResponseDto | null;
+  storeLoading: boolean;
+}
+
+export interface IChoreEngineAuthStorage {
+  tokens: ChoreEngineTokens;
   loginResponse: LoginResponseDto;
 }
 
@@ -28,7 +35,7 @@ export function useAuthContext() {
 }
 
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [[_, session], setSession] = useStorageState("tokens");
+  const [[storeLoading, session], setSession] = useStorageState("tokens");
   const [appLoading, setAppLoading] = React.useState<boolean>(false);
   const [loginResponse, setLoginResponse] = React.useState<LoginResponseDto>(
     {} as LoginResponseDto
@@ -38,22 +45,36 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setLoginResponse(usr);
   }, []);
 
+  const authSession: IChoreEngineAuthStorage = session
+    ? JSON.parse(session)
+    : null;
+
   const value: IAuthContext = React.useMemo(
     () => ({
-      initAuth: (tokens: ChoreEngineTokens) => {
+      initAuth: (auth: IChoreEngineAuthStorage) => {
         // Perform sign-in logic here
-        setSession(JSON.stringify(tokens));
+        setSession(JSON.stringify(auth));
       },
       signOut: () => {
         setSession(null);
       },
-      session,
+      session: authSession,
       appLoading,
       setAppLoading,
-      loginResponse,
+      loginResponse: authSession?.loginResponse || {},
+      isAuthenticated: !!session,
+
       handleLoginResponse,
+      storeLoading,
     }),
-    [appLoading, handleLoginResponse, loginResponse, session, setSession]
+    [
+      appLoading,
+      authSession,
+      handleLoginResponse,
+      session,
+      setSession,
+      storeLoading,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

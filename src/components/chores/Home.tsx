@@ -2,28 +2,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "devextreme/data/odata/store";
 import React from "react";
-import useIsMounted from "./useIsMounted";
+import useIsMounted from "../customHooks/useIsMounted";
 import { LoadPanel } from "devextreme-react";
 import { GridHelperFunctions, ToastTypeEnum } from "./grid.helpers";
-import { ChoreResponseDto } from "./models/ChoreResponseDto";
-import { UserResponseDto } from "./models/UserResponseDto";
-import { choreApi } from "../api/chore.api";
-import { userApi } from "../api/user.api";
-import { Frequency, _dayOfTheWeekStore } from "./stores";
+import { ChoreResponseDto } from "../../models/ChoreResponseDto";
+import { UserResponseDto } from "../../models/UserResponseDto";
+import { choreApi } from "../../api/chore.api";
+import { userApi } from "../../api/user.api";
+import { Frequency, _dayOfTheWeekStore } from "../stores";
 import ChoreGrid from "./ChoreGrid";
-import { AddEditChore } from "./addEditChore/AddEditChore";
-import { IDeleteChoreDto } from "./models/CreateChoreRequest";
-
-export enum Mode {
-  Insert,
-  Update,
-  None,
-}
+import { AddEditChore } from "../addEditChore/AddEditChore";
+import { IDeleteChoreDto } from "../../models/CreateChoreRequest";
+import { ChoreEngineCRUDMode } from "components/utils/types.utils";
 
 export interface IFormState {
   description: string;
   name: string;
-  mode: Mode;
+  mode: ChoreEngineCRUDMode;
   frequency: string;
   dayOfMonth: any | null;
   dayOfWeek: number | null;
@@ -67,7 +62,7 @@ export const Home = () => {
       biWeeklyDayOfWeek: null,
       name: "",
       description: "",
-      mode: Mode.None,
+      mode: ChoreEngineCRUDMode.None,
     } as IFormState
   );
 
@@ -116,14 +111,14 @@ export const Home = () => {
             : null,
         name: e.row.data.name,
         description: e.row.data.description,
-        mode: Mode.Update,
+        mode: ChoreEngineCRUDMode.Update,
       });
     }
   }, []);
 
   const onInitNewRow = React.useCallback(() => {
     setFormState({
-      mode: Mode.Insert,
+      mode: ChoreEngineCRUDMode.Insert,
       userId: -1,
       specificDate: null,
       specificDateVisible: false,
@@ -142,7 +137,7 @@ export const Home = () => {
 
   const handleReset = React.useCallback(() => {
     setFormState({
-      mode: Mode.None,
+      mode: ChoreEngineCRUDMode.None,
       userId: -1,
       specificDate: null,
       specificDateVisible: false,
@@ -192,8 +187,9 @@ export const Home = () => {
         onEditingStart={onEditingStart}
         onInitNewRow={onInitNewRow}
         handleDeleteButtonClicked={handleDeleteButtonClicked}
+        isLoading={loading}
       />
-      {formState.mode !== Mode.None ? (
+      {formState.mode !== ChoreEngineCRUDMode.None ? (
         <AddEditChore
           visible
           formState={formState}

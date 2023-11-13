@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { ChoreResponseDto } from "./models/ChoreResponseDto";
+import { UserResponseDto } from "../../models/UserResponseDto";
 import "devextreme/data/odata/store";
 import DataGrid, {
   Column,
@@ -12,46 +12,49 @@ import DataGrid, {
   HeaderFilter,
   SearchPanel,
   Sorting,
-  Lookup,
   ColumnChooser,
   Scrolling,
   Item as GridItem,
   Button,
 } from "devextreme-react/data-grid";
-import { useClearFilter } from "./useClearFilter";
+import { useClearFilter } from "../utils/useClearFilter";
 import { Button as MainButton } from "devextreme-react";
-import { ClearFiltersButton } from "./ClearFiltersButton";
-import { RecordsFoundToolbarItem } from "./RecordsFoundToolbarItem";
-import { GridHelperFunctions } from "./grid.helpers";
-import { UserResponseDto } from "./models/UserResponseDto";
-import useScreenSize from "./useScreenSize";
-import { _dayOfTheWeekStore, frequencyStore } from "./stores";
+import { RecordsFoundToolbarItem } from "../utils/RecordsFoundToolbarItem";
+import useScreenSize from "../customHooks/useScreenSize";
+import { _dayOfTheWeekStore } from "../stores";
+import { ClearFiltersButton } from "components/chores/ClearFiltersButton";
+import { GridHelperFunctions } from "components/chores/grid.helpers";
 
 const allowedPageSizes = [15, 30, 50, 100, 1000];
 
-interface IChoreGridProps {
-  chores: ChoreResponseDto[];
+interface IUserGridProps {
   users: UserResponseDto[];
   onInitNewRow: () => void;
   onEditingStart: (e: any) => void;
   handleDeleteButtonClicked: (e: any) => Promise<void>;
+  isDeleteButtonVisible: (e: any) => boolean;
+  isLoading: boolean;
 }
 
-const ChoreGrid: React.FC<IChoreGridProps> = ({
-  chores,
+const UserGrid: React.FC<IUserGridProps> = ({
   users,
   onInitNewRow,
   onEditingStart,
   handleDeleteButtonClicked,
+  isDeleteButtonVisible,
+  isLoading,
 }) => {
   const dataGridRef = React.useRef<any>();
 
   const { handleClearFilter } = useClearFilter(dataGridRef);
 
   const { width } = useScreenSize();
+  const noDataText = React.useMemo(() => {
+    return isLoading ? "" : "No users to display";
+  }, [isLoading]);
   return (
     <DataGrid
-      dataSource={chores}
+      dataSource={users}
       keyExpr="id"
       showBorders={true}
       wordWrapEnabled
@@ -65,6 +68,7 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
         marginTop: "1Orem !important",
       }}
       repaintChangesOnly
+      noDataText={noDataText}
     >
       <SearchPanel
         visible={true}
@@ -83,14 +87,14 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
           visible={!GridHelperFunctions.isMobileView(width)}
         >
           <RecordsFoundToolbarItem
-            recordsFound={GridHelperFunctions.calculateRecordsFound(chores)}
+            recordsFound={GridHelperFunctions.calculateRecordsFound(users)}
           />
         </GridItem>
 
         <GridItem location="after">
           <MainButton
             icon="plus"
-            hint="Add Chore"
+            hint="Add User"
             type="default"
             onClick={onInitNewRow}
           />
@@ -118,43 +122,22 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
       <Scrolling mode="standard" />
       <ColumnChooser enabled={true} mode="select" />
 
-      <Column dataField="name" caption="Name" allowGrouping={false} />
-      <Column dataField="description" caption="Additional instructions" />
-      <Column dataField="frequency" caption="Frequency">
-        <Lookup dataSource={frequencyStore} displayExpr="name" valueExpr="id" />
-      </Column>
-      <Column
-        caption="Assigned To"
-        dataField="userName"
-        // width={100}
-      >
-        <Lookup dataSource={users} displayExpr="name" valueExpr="name" />
-      </Column>
+      <Column dataField="familyName" caption="Family" allowGrouping={false} />
+      <Column dataField="name" caption="Name" />
+      <Column dataField="email" caption="Email" />
+      <Column caption="Phone Number" dataField="phoneNumber" />
       <Column
         dataField="updatedAt"
         dataType="datetime"
         caption="LastModified"
         allowEditing={false}
       />
-      <Column dataField="dayOfWeek" caption="Day of Week">
-        <Lookup
-          dataSource={_dayOfTheWeekStore}
-          displayExpr="name"
-          valueExpr="id"
-        />
-      </Column>
-      <Column dataField="dayOfMonth" caption="Day of Month" dataType="date" />
-      <Column
-        dataField="specificDate"
-        caption="Specific Date"
-        dataType="datetime"
-      />
 
       <Column type="buttons">
         <Button icon="edit" visible={true} onClick={onEditingStart} />
         <Button
           icon="trash"
-          visible={true}
+          visible={isDeleteButtonVisible}
           onClick={handleDeleteButtonClicked}
         />
       </Column>
@@ -162,4 +145,4 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
   );
 };
 
-export default React.memo(ChoreGrid);
+export default React.memo(UserGrid);

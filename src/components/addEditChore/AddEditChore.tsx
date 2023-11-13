@@ -11,17 +11,18 @@ import {
 import Form, { Label, RequiredRule, Item } from "devextreme-react/form";
 import { frequencyStore, _dayOfTheWeekStore, Frequency } from "../stores";
 import React from "react";
-import { IFormState, Mode } from "../Home";
-import { UserResponseDto } from "../models/UserResponseDto";
-import { GridHelperFunctions, ToastTypeEnum } from "../grid.helpers";
-import { IUpdateChoreDto } from "../models/CreateChoreRequest";
+import { IFormState } from "../chores/Home";
+import { UserResponseDto } from "../../models/UserResponseDto";
+import { GridHelperFunctions, ToastTypeEnum } from "../chores/grid.helpers";
+import { IUpdateChoreDto } from "../../models/CreateChoreRequest";
 import { choreApi } from "../../api/chore.api";
+import { ChoreEngineCRUDMode } from "components/utils/types.utils";
 
 interface IAddEditChoreProps {
   visible: boolean;
   onHide: () => void;
   formState: IFormState;
-  mode: Mode;
+  mode: ChoreEngineCRUDMode;
   setFormState: React.Dispatch<Partial<IFormState>>;
   users: UserResponseDto[];
   fetchData: () => Promise<void>;
@@ -132,9 +133,9 @@ export const AddEditChore: React.FC<IAddEditChoreProps> = ({
 
       let res: any;
 
-      if (formState.mode === Mode.Insert) {
+      if (formState.mode === ChoreEngineCRUDMode.Insert) {
         res = await choreApi.createChore(request);
-      } else if (formState.mode === Mode.Update) {
+      } else if (formState.mode === ChoreEngineCRUDMode.Update) {
         res = await choreApi.updateChore(request);
       } else {
         return;
@@ -148,8 +149,7 @@ export const AddEditChore: React.FC<IAddEditChoreProps> = ({
         GridHelperFunctions.toaster(ToastTypeEnum.Error, res.data as any);
       }
     } catch (error) {
-      console.error(error);
-      GridHelperFunctions.toaster(ToastTypeEnum.Error);
+      GridHelperFunctions.handleAxiosError(error);
     } finally {
       setFormState({
         isLoading: false,
@@ -196,10 +196,10 @@ export const AddEditChore: React.FC<IAddEditChoreProps> = ({
               onValueChanged={onNameChanged}
             >
               <Validator validationGroup="caseEventValidationGroup">
-                <RequiredRule message="Name is required."></RequiredRule>
+                <RequiredRule message="Title is required."></RequiredRule>
               </Validator>
             </TextBox>
-            <Label text="Name" />
+            <Label text="Title" />
           </Item>
           <Item>
             <TextBox
