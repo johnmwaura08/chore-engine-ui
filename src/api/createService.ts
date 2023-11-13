@@ -24,10 +24,10 @@ export const createService = (controller: string): AxiosInstance => {
 				if (!value) return config;
 				const authStore: IChoreEngineAuthStorage = JSON.parse(value);
 				const keys : ChoreEngineTokens = authStore?.tokens;
-				config.headers.Authorization = `Bearer ${keys?.accessToken}`;
+				config.headers!.Authorization = `Bearer ${keys?.accessToken}`;
 				return config;
 			} catch (error) {
-				return Promise.reject(error);
+				return Promise.reject(error) as any;
 			}
 		},
 		(error) => Promise.reject(error),
@@ -39,7 +39,7 @@ export const createService = (controller: string): AxiosInstance => {
 			return response;
 		},
 		async (error: any) => {
-			const originalRequest = error.config as AxiosRequestConfig;
+			const originalRequest = error.config as any;
 			if (error.response?.status === 401 && !originalRequest._retry) {
 				originalRequest._retry = true;
 				try {
@@ -52,7 +52,12 @@ export const createService = (controller: string): AxiosInstance => {
 						accessToken,
 						refreshToken: authStore.tokens.refreshToken,
 					};
-					await setStorageItemAsync("tokens", JSON.stringify(newTokens));
+
+					const newInit: IChoreEngineAuthStorage = {
+						loginResponse: authStore.loginResponse,
+						tokens: newTokens,
+					}
+					await setStorageItemAsync("tokens", JSON.stringify(newInit));
 					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 					return apiService(originalRequest);
 				} catch (err) {

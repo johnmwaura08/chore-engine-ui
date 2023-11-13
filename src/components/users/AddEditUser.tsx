@@ -12,6 +12,7 @@ import Form, {
   RequiredRule,
   Item,
   EmailRule,
+  PatternRule,
 } from "devextreme-react/form";
 import React from "react";
 import { userApi } from "../../api/user.api";
@@ -194,19 +195,28 @@ export const AddEditUser: React.FC<IAddEditUserProps> = ({
               disabled={formState.mode === ChoreEngineCRUDMode.Update}
             >
               <Validator validationGroup="addEditUserValidationGroup">
-                <RequiredRule message="Name is required."></RequiredRule>
+                <RequiredRule message="Email is required."></RequiredRule>
                 <EmailRule message="Email is invalid."></EmailRule>
               </Validator>
             </TextBox>
 
             <Label text="Email" />
           </Item>
-          <Item>
+          <Item helpText="Enter the phone number in USA phone format">
             <TextBox
               defaultValue={formState.phoneNumber}
               onValueChanged={onPhoneNumberChanged}
+              mask="+1 (X00) 000-0000"
+              maskRules={{
+                X: /[02-9]/,
+              }}
+              maskInvalidMessage="The phone must have a correct USA phone format"
             >
               <Validator validationGroup="addEditUserValidationGroup">
+                <PatternRule
+                  message="The phone must have a correct USA phone format"
+                  pattern={/^[02-9]\d{9}$/}
+                />
                 <RequiredRule message="Phone Number is required."></RequiredRule>
               </Validator>
             </TextBox>

@@ -15,6 +15,7 @@ interface IAuthContext {
   setAppLoading: React.Dispatch<React.SetStateAction<boolean>>;
   handleLoginResponse: (usr: LoginResponseDto) => void;
   loginResponse: LoginResponseDto | null;
+  storeLoading: boolean;
 }
 
 export interface IChoreEngineAuthStorage {
@@ -34,7 +35,7 @@ export function useAuthContext() {
 }
 
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [[_, session], setSession] = useStorageState("tokens");
+  const [[storeLoading, session], setSession] = useStorageState("tokens");
   const [appLoading, setAppLoading] = React.useState<boolean>(false);
   const [loginResponse, setLoginResponse] = React.useState<LoginResponseDto>(
     {} as LoginResponseDto
@@ -64,8 +65,16 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       isAuthenticated: !!session,
 
       handleLoginResponse,
+      storeLoading,
     }),
-    [appLoading, authSession, handleLoginResponse, session, setSession]
+    [
+      appLoading,
+      authSession,
+      handleLoginResponse,
+      session,
+      setSession,
+      storeLoading,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

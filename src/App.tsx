@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import { AppRouter } from "./AppRouter";
 import { BrowserRouter as Router } from "react-router-dom";
 import { AuthProvider } from "context/useAuth";
+import React from "react";
 
 function App() {
   return (

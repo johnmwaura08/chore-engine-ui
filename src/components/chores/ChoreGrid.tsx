@@ -128,7 +128,7 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
       <Scrolling mode="standard" />
       <ColumnChooser enabled={true} mode="select" />
 
-      <Column dataField="name" caption="Name" allowGrouping={false} />
+      <Column dataField="name" caption="Title" allowGrouping={false} />
       <Column dataField="description" caption="Additional instructions" />
       <Column dataField="frequency" caption="Frequency">
         <Lookup dataSource={frequencyStore} displayExpr="name" valueExpr="id" />

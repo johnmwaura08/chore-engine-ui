@@ -3,24 +3,22 @@ import { LoginForm } from "./LoginForm";
 import { useLocation } from "react-router";
 import { Navigate } from "react-router-dom";
 import React from "react";
+import { Change } from "devextreme-react/data-grid";
+import { ChangePasswordForm } from "./ChangePassword";
 
 const LoginMain = () => {
-  const { loginResponse, isAuthenticated } = useAuthContext();
-
   // const navigate = useNavigate();
   const location = useLocation();
-  const { from } = location.state || { from: { pathname: "/" } };
+  const { from, isAuthenticated, passwordExpired } = location.state || {
+    from: { pathname: "/" },
+    isAuthenticated: false,
+    passwordExpired: false,
+  };
 
   if (!isAuthenticated) {
     return <LoginForm />;
-  } else if (isAuthenticated && loginResponse?.passwordExpired) {
-    return (
-      <div>
-        <div>
-          <div>Change Password</div>
-        </div>
-      </div>
-    );
+  } else if (isAuthenticated && passwordExpired) {
+    return <ChangePasswordForm />;
   }
 
   return <Navigate to={from} />;

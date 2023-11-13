@@ -19,6 +19,14 @@ export module GridHelperFunctions {
     draggable: true,
     progress: undefined,
   };
+	export const passwordComplexity = (e: any): boolean => validatePasswordComplexity(e.value);
+
+  export const validatePasswordComplexity = (password: string): boolean => {
+    const passwordRegex = new RegExp(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*([^a-zA-Z\d\s])).{8,20}$/,
+    );
+    return passwordRegex.test(password);
+  };
 
   export const toaster = (type: ToastTypeEnum, message?: string) => {
     switch (type) {

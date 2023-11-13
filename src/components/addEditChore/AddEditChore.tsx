@@ -196,10 +196,10 @@ export const AddEditChore: React.FC<IAddEditChoreProps> = ({
               onValueChanged={onNameChanged}
             >
               <Validator validationGroup="caseEventValidationGroup">
-                <RequiredRule message="Name is required."></RequiredRule>
+                <RequiredRule message="Title is required."></RequiredRule>
               </Validator>
             </TextBox>
-            <Label text="Name" />
+            <Label text="Title" />
           </Item>
           <Item>
             <TextBox

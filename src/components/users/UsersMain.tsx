@@ -133,7 +133,6 @@ export const UsersMain = () => {
           setFormState={setFormState}
           onHide={handleReset}
           mode={formState.mode}
-          users={users}
           fetchData={fetchData}
         />
       ) : (
