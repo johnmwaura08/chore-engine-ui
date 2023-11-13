@@ -1,13 +1,14 @@
 import { AxiosResponse } from "axios";
 import { createService } from "./createService";
-import { LoginResponseDto } from "../components/models/LoginResponseDto";
+import { LoginResponseDto } from "../models/LoginResponseDto";
+import { createPublicService } from "./createPublicService";
 
-const authService = createService("Auth");
+const authService = createPublicService("Auth");
 
 interface IAuthApi {
 	login: ({email, password}: {email: string, password: string}) => Promise<AxiosResponse<LoginResponseDto>>;
     changePassword: ({password}: {password: string}) => Promise<AxiosResponse<LoginResponseDto>>;
-  refresh: ({refreshToken}: {
+  refreshToken: ({refreshToken}: {
   refreshToken: string;
 
   }) => Promise<AxiosResponse<string>>;
@@ -15,5 +16,5 @@ interface IAuthApi {
 export const authApi: IAuthApi = {
 	login: (req) => authService.post('login', req),
     changePassword: (req) => authService.post('change-password', req),
-    refresh: (req) => authService.post('refresh', req),
+    refreshToken: (req) => authService.post('refresh', req),
 };

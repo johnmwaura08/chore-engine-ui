@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { GridHelperFunctions, ToastTypeEnum } from "./grid.helpers";
+import { GridHelperFunctions, ToastTypeEnum } from "../chores/grid.helpers";
 
 export const useCopyToClipboard = () => {
   const copyToClipboard = (str: string) => {

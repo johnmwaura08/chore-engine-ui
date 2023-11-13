@@ -8,8 +8,11 @@ import logo from "../../assets/logo.png";
 import React from "react";
 import "./login.css";
 import { EmailRule } from "devextreme-react/data-grid";
-import { GridHelperFunctions, ToastTypeEnum } from "../grid.helpers";
+import { GridHelperFunctions, ToastTypeEnum } from "../chores/grid.helpers";
 import { authApi } from "../../api/auth.api";
+import { useNavigate, useLocation } from "react-router";
+import { IChoreEngineAuthStorage, useAuthContext } from "context/useAuth";
+import { ChoreEngineTokens } from "models/chore-engine.tokens";
 
 interface IFormState {
   email: string;
@@ -22,6 +25,10 @@ export const LoginForm: FC = (): JSX.Element => {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { initAuth, handleLoginResponse } = useAuthContext();
+  const { from } = location.state || { from: { pathname: "/" } };
 
   const onEnterKeyPressed = () => {
     formRef && formRef?.current?.instance?.validate();
@@ -38,12 +45,22 @@ export const LoginForm: FC = (): JSX.Element => {
         password: dataSource.password,
       });
       if (res.status === 200 || res.status === 201) {
-        GridHelperFunctions.toaster(ToastTypeEnum.Success, "Login Success");
+        const tokens: ChoreEngineTokens = {
+          accessToken: res.data.accessToken,
+          refreshToken: res.data.refreshToken,
+        };
+
+        const toStore: IChoreEngineAuthStorage = {
+          tokens: tokens,
+          loginResponse: res.data,
+        };
+        initAuth(toStore);
+        navigate(from);
       } else {
         GridHelperFunctions.toaster(ToastTypeEnum.Error, "Invalid Credentials");
       }
     } catch (error) {
-      GridHelperFunctions.toaster(ToastTypeEnum.Error, "Invalid Credentials");
+      GridHelperFunctions.handleAxiosError(error);
     }
   };
 
@@ -55,8 +72,12 @@ export const LoginForm: FC = (): JSX.Element => {
   };
 
   return (
-    <ScrollView height="auto" className="boit-login-form" showScrollbar="never">
-      <div className="boit-login-header">
+    <ScrollView
+      height="auto"
+      className="chore-engine-login-form"
+      showScrollbar="never"
+    >
+      <div className="chore-engine-login-header">
         <img src={logo} alt="Logo" style={{ width: 240, marginRight: 10 }} />
         <div className="login-subtitle">Authentication Required</div>
       </div>

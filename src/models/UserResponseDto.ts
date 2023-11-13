@@ -6,4 +6,5 @@ export type  UserResponseDto = {
     id: number;
     createdAt: string;
     updatedAt: string;
+    isAdmin: boolean;
   }

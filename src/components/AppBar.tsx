@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -19,6 +19,9 @@ import ListItemText from "@mui/material/ListItemText";
 import Forward5Icon from "@mui/icons-material/Forward5";
 import PersonIcon from "@mui/icons-material/Person";
 import logo from "../assets/logo.png";
+import { useAuthContext } from "context/useAuth";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -79,12 +82,31 @@ export const ChoreEngineNavBar: React.FC<NavBarProps> = ({ children }) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
+  const { signOut } = useAuthContext();
+  const navigate = useNavigate();
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const handleLogoutClicked = () => {
+    signOut();
+  };
+
+  const handleGotoUserManagement = () => {
+    navigate("/users");
+  };
+
+  const handleGotoHistory = () => {
+    navigate("/chore-history");
+  };
+
+  const handleGotoHome = () => {
+    navigate("/");
   };
   return (
     <Box sx={{ display: "flex" }}>
@@ -141,32 +163,43 @@ export const ChoreEngineNavBar: React.FC<NavBarProps> = ({ children }) => {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <PersonIcon />
-              </ListItemIcon>
-              <ListItemText primary="Profile" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={handleGotoHome}>
               <ListItemIcon>
                 <Forward5Icon />
               </ListItemIcon>
-              <ListItemText primary="History" />
+              <ListItemText primary="Chores" />
             </ListItemButton>
           </ListItem>
+          <Divider />
           <ListItem disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={handleGotoUserManagement}>
               <ListItemIcon>
                 <PeopleOutlineIcon />
               </ListItemIcon>
               <ListItemText primary="User Management" />
             </ListItemButton>
           </ListItem>
+          <Divider />
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleGotoHistory}>
+              <ListItemIcon>
+                <Forward5Icon />
+              </ListItemIcon>
+              <ListItemText primary="History" />
+            </ListItemButton>
+          </ListItem>
         </List>
         <Divider />
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleLogoutClicked}>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Sign Out" />
+            </ListItemButton>
+          </ListItem>
+        </List>
       </Drawer>
       <Main open={open}>
         <DrawerHeader />

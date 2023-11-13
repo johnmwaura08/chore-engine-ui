@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { ToastOptions, toast } from "react-toastify";
 import { DateTime } from "luxon";
+import axios from "axios";
 
 export enum ToastTypeEnum {
   Success = "Success",
@@ -119,6 +120,21 @@ export module GridHelperFunctions {
     return luxonDateTime.day;
   
  
+  }
+  export const stringIsNullOrEmpty = (str: string | undefined): boolean =>
+  str === null || str === undefined || str === '' || str.trim().length === 0;
+
+  export function handleAxiosError(error: any){
+    if (axios.isAxiosError(error)) {
+      console.error("axios res", error.response);
+     toaster(
+        ToastTypeEnum.Error,
+        error?.response?.data?.message
+      );
+    } else {
+      console.error(error);
+   toaster(ToastTypeEnum.Error);
+    }
   }
   
 }

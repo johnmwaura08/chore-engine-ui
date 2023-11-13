@@ -11,8 +11,8 @@ const PrivateRoutes = ({
   redirectPath?: string;
   children?: React.ReactNode;
 }) => {
-  return !isAuthenticated || passwordExpired ? (
-    <Navigate to="/login" />
+  return !isAuthenticated ? (
+    <Navigate to="/login" state={{ from: window.location.pathname }} />
   ) : (
     <ChoreEngineNavBar>
       <Outlet />

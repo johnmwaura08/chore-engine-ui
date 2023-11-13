@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { ChoreResponseDto } from "./models/ChoreResponseDto";
+import { ChoreResponseDto } from "../../models/ChoreResponseDto";
 import "devextreme/data/odata/store";
 import DataGrid, {
   Column,
@@ -18,14 +18,15 @@ import DataGrid, {
   Item as GridItem,
   Button,
 } from "devextreme-react/data-grid";
-import { useClearFilter } from "./useClearFilter";
+import { useClearFilter } from "../utils/useClearFilter";
 import { Button as MainButton } from "devextreme-react";
 import { ClearFiltersButton } from "./ClearFiltersButton";
-import { RecordsFoundToolbarItem } from "./RecordsFoundToolbarItem";
+import { RecordsFoundToolbarItem } from "../utils/RecordsFoundToolbarItem";
 import { GridHelperFunctions } from "./grid.helpers";
-import { UserResponseDto } from "./models/UserResponseDto";
-import useScreenSize from "./useScreenSize";
-import { _dayOfTheWeekStore, frequencyStore } from "./stores";
+import { UserResponseDto } from "../../models/UserResponseDto";
+import useScreenSize from "../customHooks/useScreenSize";
+import { _dayOfTheWeekStore, frequencyStore } from "../stores";
+import { GridType } from "./chores.types";
 
 const allowedPageSizes = [15, 30, 50, 100, 1000];
 
@@ -35,6 +36,8 @@ interface IChoreGridProps {
   onInitNewRow: () => void;
   onEditingStart: (e: any) => void;
   handleDeleteButtonClicked: (e: any) => Promise<void>;
+  isLoading: boolean;
+  gridType?: GridType;
 }
 
 const ChoreGrid: React.FC<IChoreGridProps> = ({
@@ -43,12 +46,18 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
   onInitNewRow,
   onEditingStart,
   handleDeleteButtonClicked,
+  gridType = GridType.Current,
+  isLoading,
 }) => {
   const dataGridRef = React.useRef<any>();
 
   const { handleClearFilter } = useClearFilter(dataGridRef);
 
   const { width } = useScreenSize();
+
+  const noDataText = React.useMemo(() => {
+    return isLoading ? "" : "No chores to display";
+  }, [isLoading]);
   return (
     <DataGrid
       dataSource={chores}
@@ -65,6 +74,7 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
         marginTop: "1Orem !important",
       }}
       repaintChangesOnly
+      noDataText={noDataText}
     >
       <SearchPanel
         visible={true}
@@ -87,7 +97,7 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
           />
         </GridItem>
 
-        <GridItem location="after">
+        <GridItem location="after" visible={gridType === GridType.Current}>
           <MainButton
             icon="plus"
             hint="Add Chore"
@@ -151,7 +161,11 @@ const ChoreGrid: React.FC<IChoreGridProps> = ({
       />
 
       <Column type="buttons">
-        <Button icon="edit" visible={true} onClick={onEditingStart} />
+        <Button
+          icon="edit"
+          visible={gridType === GridType.Current}
+          onClick={onEditingStart}
+        />
         <Button
           icon="trash"
           visible={true}

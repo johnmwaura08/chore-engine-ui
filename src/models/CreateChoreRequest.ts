@@ -1,4 +1,4 @@
-import { Frequency } from "../stores";
+import { Frequency } from "../components/stores";
 
 
 export interface  ICreateChoreDto {
