@@ -17,11 +17,11 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Forward5Icon from "@mui/icons-material/Forward5";
-import PersonIcon from "@mui/icons-material/Person";
 import logo from "../assets/logo.png";
 import { useAuthContext } from "context/useAuth";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 
 const drawerWidth = 240;
 
@@ -116,8 +116,6 @@ export const ChoreEngineNavBar: React.FC<NavBarProps> = ({ children }) => {
         open={open}
         sx={{
           backgroundColor: "#9C27B0",
-          //   backgroundColor: "#F500A2",
-          //   backgroundColor: "white",
         }}
       >
         <Toolbar>
@@ -130,12 +128,7 @@ export const ChoreEngineNavBar: React.FC<NavBarProps> = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          {/* <h3>Chore Engine</h3> */}
-          {/* <img src={logo} alt="logo" width="4rem" height="4rem" /> */}
           <img src={logo} alt="Logo" style={{ width: 240, marginRight: 10 }} />
-          {/* <Typography variant="" noWrap component="div">
-            Persistent drawer
-          </Typography> */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -165,7 +158,7 @@ export const ChoreEngineNavBar: React.FC<NavBarProps> = ({ children }) => {
           <ListItem disablePadding>
             <ListItemButton onClick={handleGotoHome}>
               <ListItemIcon>
-                <Forward5Icon />
+                <AssignmentIcon />
               </ListItemIcon>
               <ListItemText primary="Chores" />
             </ListItemButton>
