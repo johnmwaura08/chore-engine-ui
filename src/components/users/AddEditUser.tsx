@@ -237,7 +237,15 @@ export const AddEditUser: React.FC<IAddEditUserProps> = ({
             ></Switch>
             <Label text="Change Password" />
           </Item>
-          <Item>
+          <Item
+            visible={
+              formState.changePassword &&
+              formState.mode === ChoreEngineCRUDMode.Update &&
+              !GridHelperFunctions.stringIsNullOrEmpty(formState.email) &&
+              !GridHelperFunctions.stringIsNullOrEmpty(loginResponse?.email) &&
+              formState.email === loginResponse?.email
+            }
+          >
             <TextBox
               defaultValue={formState.password}
               onValueChanged={onPasswordChanged}
