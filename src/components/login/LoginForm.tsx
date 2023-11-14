@@ -13,6 +13,7 @@ import { authApi } from "../../api/auth.api";
 import { useNavigate, useLocation } from "react-router";
 import { IChoreEngineAuthStorage, useAuthContext } from "context/useAuth";
 import { ChoreEngineTokens } from "models/chore-engine.tokens";
+import Footer from "Footer";
 
 interface IFormState {
   email: string;
@@ -72,64 +73,70 @@ export const LoginForm: FC = (): JSX.Element => {
   };
 
   return (
-    <ScrollView
-      height="auto"
-      className="chore-engine-login-form"
-      showScrollbar="never"
-    >
-      <div className="chore-engine-login-header">
-        <img src={logo} alt="Logo" style={{ width: 240, marginRight: 10 }} />
-        <div className="login-subtitle">Authentication Required</div>
-      </div>
+    <>
+      <ScrollView
+        height="auto"
+        className="chore-engine-login-form"
+        showScrollbar="never"
+      >
+        <div className="chore-engine-login-header">
+          <img src={logo} alt="Logo" style={{ width: 240, marginRight: 10 }} />
+          <div className="login-subtitle">Authentication Required</div>
+        </div>
 
-      <form onSubmit={onSubmit}>
-        <Form
-          ref={formRef}
-          colCount={1}
-          id="login"
-          formData={dataSource}
-          labelLocation="left"
-          readOnly={false}
-          validationGroup="formAddNotification"
-          showValidationSummary
-        >
-          <SimpleItem
-            dataField="email"
-            editorOptions={{ onEnterKey: onEnterKeyPressed }}
-            isRequired
+        <form onSubmit={onSubmit}>
+          <Form
+            ref={formRef}
+            colCount={1}
+            id="login"
+            formData={dataSource}
+            labelLocation="left"
+            readOnly={false}
+            validationGroup="formAddNotification"
+            showValidationSummary
           >
-            <Label text="Email" />
-            <RequiredRule message="Email is required" />
-            <EmailRule message="Email is invalid" />
-          </SimpleItem>
-          <SimpleItem
-            dataField="password"
-            editorType="dxTextBox"
-            editorOptions={{ mode: "password", onEnterKey: onEnterKeyPressed }}
-            isRequired
-          />
-          <SimpleItem>
-            <div
-              className="dx-field"
-              style={{
-                textAlign: "center",
-                width: "100%",
-                display: "inline-block",
-              }}
+            <SimpleItem
+              dataField="email"
+              editorOptions={{ onEnterKey: onEnterKeyPressed }}
+              isRequired
             >
-              <Button
-                type="default"
-                text="Sign In"
-                width={270}
-                onClick={onSubmit}
+              <Label text="Email" />
+              <RequiredRule message="Email is required" />
+              <EmailRule message="Email is invalid" />
+            </SimpleItem>
+            <SimpleItem
+              dataField="password"
+              editorType="dxTextBox"
+              editorOptions={{
+                mode: "password",
+                onEnterKey: onEnterKeyPressed,
+              }}
+              isRequired
+            />
+            <SimpleItem>
+              <div
+                className="dx-field"
                 style={{
-                  marginLeft: "4rem",
+                  textAlign: "center",
+                  width: "100%",
+                  display: "inline-block",
                 }}
-              />
-            </div>
-          </SimpleItem>
-        </Form>
-      </form>
-    </ScrollView>
+              >
+                <Button
+                  type="default"
+                  text="Sign In"
+                  width={270}
+                  onClick={onSubmit}
+                  style={{
+                    marginLeft: "4rem",
+                  }}
+                />
+              </div>
+            </SimpleItem>
+          </Form>
+        </form>
+      </ScrollView>
+      <Footer />
+    </>
   );
 };
