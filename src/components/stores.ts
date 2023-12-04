@@ -42,6 +42,6 @@ export const _dayOfTheWeekStore = [
     { id: Frequency.DAILY, name: "Daily" },
     { id: Frequency.WEEKLY, name: "Weekly" },
     { id: Frequency.MONTHLY, name: "Monthly" },
-    { id: Frequency.BIWEEKLY, name: "Biweekly" },
+   // { id: Frequency.BIWEEKLY, name: "Biweekly" }, will reimplement later
     { id: Frequency.SPECIFIC_DATE, name: "Specific Date" },
   ];
