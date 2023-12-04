@@ -61,6 +61,8 @@ export const createService = (controller: string): AxiosInstance => {
 					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 					return apiService(originalRequest);
 				} catch (err) {
+					console.error('refresh failed', err)
+					setStorageItemAsync("tokens", null);
 					return Promise.reject(err);
 				}
 			}

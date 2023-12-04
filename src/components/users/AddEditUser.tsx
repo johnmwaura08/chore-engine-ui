@@ -154,8 +154,8 @@ export const AddEditUser: React.FC<IAddEditUserProps> = ({
     <Popup
       title="User Management"
       showTitle={true}
-      minWidth="35%"
-      minHeight="45%"
+      width="55rem"
+      height="35rem"
       resizeEnabled
       visible={visible}
       onHiding={onHide}

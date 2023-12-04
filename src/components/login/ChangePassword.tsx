@@ -81,7 +81,9 @@ export const ChangePasswordForm: React.FC = () => {
     >
       <div className="chore-engine-login-header">
         <img src={logo} alt="Logo" style={{ width: 240, marginRight: 10 }} />
-        <div className="login-subtitle">Your Password Has Expired</div>
+        <div className="login-subtitle" style={{ color: "red" }}>
+          Your Password Has Expired
+        </div>
       </div>
 
       <form onSubmit={onSubmit}>

@@ -14,6 +14,7 @@ import { useNavigate, useLocation } from "react-router";
 import { IChoreEngineAuthStorage, useAuthContext } from "context/useAuth";
 import { ChoreEngineTokens } from "models/chore-engine.tokens";
 import Footer from "Footer";
+import { ForgotPasswordPopup } from "./ForgotPasswordPopup";
 
 interface IFormState {
   email: string;
@@ -28,6 +29,9 @@ export const LoginForm: FC = (): JSX.Element => {
   });
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [forgotPasswordModalOpen, setForgotPasswordModalOpen] =
+    React.useState(false);
   const { initAuth, handleLoginResponse } = useAuthContext();
   const { from } = location.state || { from: { pathname: "/" } };
 
@@ -71,6 +75,14 @@ export const LoginForm: FC = (): JSX.Element => {
       await handleLogin();
     }
   };
+
+  const handleForgotPassword = React.useCallback(() => {
+    setForgotPasswordModalOpen(true);
+  }, []);
+
+  const handleCloseForgotPassword = React.useCallback(() => {
+    setForgotPasswordModalOpen(false);
+  }, []);
 
   return (
     <>
@@ -129,14 +141,36 @@ export const LoginForm: FC = (): JSX.Element => {
                   onClick={onSubmit}
                   style={{
                     marginLeft: "4rem",
+                    marginBottom: "1rem",
+                  }}
+                />
+                <Button
+                  type="default"
+                  text="Forgot Password"
+                  width={270}
+                  onClick={handleForgotPassword}
+                  style={{
+                    marginLeft: "4rem",
+                    backgroundColor: "transparent",
+                    color: "black",
                   }}
                 />
               </div>
+              <div></div>
             </SimpleItem>
           </Form>
         </form>
       </ScrollView>
       <Footer />
+
+      {forgotPasswordModalOpen ? (
+        <ForgotPasswordPopup
+          visible={forgotPasswordModalOpen}
+          onHide={handleCloseForgotPassword}
+        />
+      ) : (
+        <></>
+      )}
     </>
   );
 };

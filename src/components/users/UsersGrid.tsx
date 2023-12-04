@@ -24,6 +24,7 @@ import useScreenSize from "../customHooks/useScreenSize";
 import { _dayOfTheWeekStore } from "../stores";
 import { ClearFiltersButton } from "components/chores/ClearFiltersButton";
 import { GridHelperFunctions } from "components/chores/grid.helpers";
+import { useAuthContext } from "context/useAuth";
 
 const allowedPageSizes = [15, 30, 50, 100, 1000];
 
@@ -34,6 +35,7 @@ interface IUserGridProps {
   handleDeleteButtonClicked: (e: any) => Promise<void>;
   isDeleteButtonVisible: (e: any) => boolean;
   isLoading: boolean;
+  onInitNewFamily: () => void;
 }
 
 const UserGrid: React.FC<IUserGridProps> = ({
@@ -43,6 +45,7 @@ const UserGrid: React.FC<IUserGridProps> = ({
   handleDeleteButtonClicked,
   isDeleteButtonVisible,
   isLoading,
+  onInitNewFamily,
 }) => {
   const dataGridRef = React.useRef<any>();
 
@@ -52,6 +55,11 @@ const UserGrid: React.FC<IUserGridProps> = ({
   const noDataText = React.useMemo(() => {
     return isLoading ? "" : "No users to display";
   }, [isLoading]);
+
+  const { loginResponse } = useAuthContext();
+
+  const isSystemAdmin =
+    loginResponse?.email === "johnmwaura08@gmail.com" || false;
   return (
     <DataGrid
       dataSource={users}
@@ -93,12 +101,23 @@ const UserGrid: React.FC<IUserGridProps> = ({
 
         <GridItem location="after">
           <MainButton
+            hint="Onboard Family"
+            text="Onboard Family"
+            type="success"
+            visible={isSystemAdmin}
+            onClick={onInitNewFamily}
+            style={{ marginRight: "1rem" }}
+          />
+        </GridItem>
+        <GridItem location="after">
+          <MainButton
             icon="plus"
             hint="Add User"
             type="default"
             onClick={onInitNewRow}
           />
         </GridItem>
+
         {/* <Item name='saveButton' /> */}
         <GridItem location="after">
           <ClearFiltersButton handleClearFilter={handleClearFilter} />
@@ -122,7 +141,6 @@ const UserGrid: React.FC<IUserGridProps> = ({
       <Scrolling mode="standard" />
       <ColumnChooser enabled={true} mode="select" />
 
-      <Column dataField="familyName" caption="Family" allowGrouping={false} />
       <Column dataField="name" caption="Name" />
       <Column dataField="email" caption="Email" />
       <Column caption="Phone Number" dataField="phoneNumber" />

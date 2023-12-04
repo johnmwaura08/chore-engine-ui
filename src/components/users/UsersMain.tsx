@@ -13,11 +13,13 @@ import {
 } from "components/chores/grid.helpers";
 import { DeleteUserDto } from "models/users.dto";
 import { AddEditUser } from "./AddEditUser";
+import { OnboardUser } from "./OnboardUser";
 
 export const UsersMain = () => {
   const [loading, setLoading] = React.useState(false);
   const [users, setUsers] = React.useState<UserResponseDto[]>([]);
   const isMounted = useIsMounted();
+  const [onboardUserOpen, setOnboardUserOpen] = React.useState(false);
 
   const [formState, setFormState] = React.useReducer(
     (state: IUserFormState, newState: UserFormStateAction) => ({
@@ -115,6 +117,14 @@ export const UsersMain = () => {
     }
     return false;
   }, []);
+
+  const handleOnBoardButtonClicked = React.useCallback(() => {
+    setOnboardUserOpen(true);
+  }, []);
+
+  const handleOnBoardUserHide = React.useCallback(() => {
+    setOnboardUserOpen(false);
+  }, []);
   return (
     <div id="data-grid-demo">
       <LoadPanel visible={loading} position="center" showIndicator showPane />
@@ -125,6 +135,7 @@ export const UsersMain = () => {
         handleDeleteButtonClicked={handleDeleteButtonClicked}
         isDeleteButtonVisible={isDeleteButtonVisible}
         isLoading={loading}
+        onInitNewFamily={handleOnBoardButtonClicked}
       />
       {formState.mode !== ChoreEngineCRUDMode.None ? (
         <AddEditUser
@@ -135,6 +146,11 @@ export const UsersMain = () => {
           mode={formState.mode}
           fetchData={fetchData}
         />
+      ) : (
+        <></>
+      )}
+      {onboardUserOpen ? (
+        <OnboardUser visible={onboardUserOpen} onHide={handleOnBoardUserHide} />
       ) : (
         <></>
       )}

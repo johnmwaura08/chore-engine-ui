@@ -12,9 +12,12 @@ interface IAuthApi {
   refreshToken: string;
 
   }) => Promise<AxiosResponse<string>>;
+
+  forgotPassword: ({email}: {email: string}) => Promise<AxiosResponse<boolean>>;
 }
 export const authApi: IAuthApi = {
 	login: (req) => authService.post('login', req),
-    changePassword: (req) => authService.post('change-password', req),
+  changePassword: (req) => authService.post('change-password', req),
     refreshToken: (req) => authService.post('refresh', req),
+    forgotPassword: (req) => authService.post('forgot-password', req),
 };
